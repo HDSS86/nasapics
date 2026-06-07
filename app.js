@@ -1,5 +1,5 @@
 // Definimos la dirección de la NASA y la clave de acceso de prueba
-const API_KEY = 'DEMO_KEY';
+const API_KEY = '11XRTyWQu3YE8RLANLxgVB6GZl6tIvWKAU7tJ1wO';
 const URL_NASA = `https://api.nasa.gov/planetary/apod?api_key=${API_KEY}`;
 
 // Traemos los elementos del HTML para poder cambiarlos desde acá

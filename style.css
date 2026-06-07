@@ -1,0 +1,87 @@
+/* Configuraciones generales de la pantalla */
+body {
+    background-color: #0d0f12; /* Un negro azulado muy profundo */
+    color: #e2e8f0; /* Blanco suave para que no queme los ojos */
+    font-family: 'Courier New', Courier, monospace; /* Tipografía tipo terminal retro */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* Cabecera del sitio */
+header {
+    text-align: center;
+    padding: 2rem 1rem;
+    width: 100%;
+    background: linear-gradient(180deg, #161b22 0%, #0d0f12 100%);
+    border-bottom: 1px solid #1f2937;
+}
+
+header h1 {
+    font-size: 2.2rem;
+    margin: 0 0 0.5rem 0;
+    color: #4f46e5; /* Un tono índigo/neón eléctrico */
+    text-shadow: 0 0 10px rgba(79, 70, 229, 0.5);
+}
+
+header p {
+    color: #9ca3af;
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+/* Tarjeta contenedora de la foto */
+.container {
+    max-width: 800px;
+    width: 90%;
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background-color: #161a22; /* Fondo gris oscuro para la tarjeta */
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    border: 1px solid #2d3748;
+}
+
+/* Título de la imagen de la NASA */
+#pic-title {
+    font-size: 1.5rem;
+    color: #f3f4f6;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    border-left: 4px solid #4f46e5;
+    padding-left: 10px;
+}
+
+/* Contenedor y comportamiento de la imagen */
+#media-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    background-color: #0a0c10;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+
+#pic-image {
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+    display: block;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+/* Texto explicativo científico */
+#pic-explanation {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #cbd5e1;
+    text-align: justify;
+    background-color: #1e2430;
+    padding: 1rem;
+    border-radius: 4px;
+    border-left: 2px solid #9ca3af;
+}
