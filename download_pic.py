@@ -4,14 +4,14 @@ import requests
 import subprocess
 from datetime import datetime
 
-# 1. Diccionario de meses
+# 1. Diccionario para pasar el nombre del mes a inglés limpio
 MESES = {
     1: "january", 2: "february", 3: "march", 4: "april",
     5: "may", 6: "june", 7: "july", 8: "august",
     9: "september", 10: "october", 11: "november", 12: "december"
 }
 
-# 2. Leer API Key de app.js
+# 2. Extracción de la API Key desde tu app.js (Tal cual funcionaba antes)
 api_key = None
 if os.path.exists("app.js"):
     with open("app.js", "r") as f:
@@ -20,40 +20,40 @@ if os.path.exists("app.js"):
         if match:
             api_key = match.group(1)
 
-if not api_key:
-    print("❌ No encontramos una API Key válida.")
+if not api_key or api_key == "DEMO_KEY" or "AQUÍ" in api_key:
+    print("❌ No encontramos una API Key válida en tu app.js.")
     exit()
 
-# 3. Rutas y Carpetas Dinámicas
+# 3. Configuración de Carpetas Dinámicas por Mes y Año
 fecha_actual = datetime.now()
 nombre_mes = MESES[fecha_actual.month]
 año_actual = fecha_actual.year
+
+# Nombre de la carpeta: "nasapics june 2026"
 nombre_carpeta_mes = f"nasapics {nombre_mes} {año_actual}"
 
-# Ruta local dentro de Linux WSL
+# Creamos la carpeta de forma local en Linux para que no se cuelgue WSL
 RUTA_LOCAL = nombre_carpeta_mes
 os.makedirs(RUTA_LOCAL, exist_ok=True)
 
-# 4. PUENTE AUTOMÁTICO CON WINDOWS
-# Creamos el enlace simbólico desde Python para que aparezca en tu disco C automáticamente
+# 4. Enlace automático con tu disco C de Windows
 ruta_absoluta_local = os.path.abspath(RUTA_LOCAL)
 ruta_windows_target = f"/mnt/c/VS CODE PROJECTS/nasapics/{nombre_carpeta_mes}"
 
 if not os.path.exists(ruta_windows_target):
     try:
-        # Ejecuta el comando de enlace de Linux de forma silenciosa si no existe el puente
+        # Ejecuta el comando de Linux para crear el acceso directo en Windows de forma automática
         subprocess.run(["ln", "-s", ruta_absoluta_local, ruta_windows_target], check=True)
-        print(f"🔗 Enlace creado con éxito en Windows para: {nombre_carpeta_mes}")
+        print(f"🔗 Enlace creado automáticamente con Windows para: {nombre_carpeta_mes}")
     except Exception as e:
-        # Si por alguna razón de permisos de WSL no puede, el script sigue adelante localmente
-        print(f"⚠️ Nota: No se pudo crear el acceso directo en Windows de forma automática: {e}")
+        print(f"⚠️ Nota sobre el enlace de Windows: {e}")
 
-# 5. Conexión con la NASA
+# 5. Petición y descarga a la API de la NASA
 URL_NASA = f"https://api.nasa.gov/planetary/apod?api_key={api_key}"
 
 try:
-    print("🛰️ Conectando con la NASA...")
-    respuesta = requests.get(URL_NASA, timeout=15).json()
+    print("🛰️ Conectando con la API de la NASA...")
+    respuesta = requests.get(URL_NASA).json()
     
     if "error" in respuesta:
         print(f"❌ Error de la NASA: {respuesta['error']['message']}")
@@ -65,34 +65,37 @@ try:
         titulo = "".join(c for c in titulo if c.isalnum() or c == "_")
         fecha_str = fecha_actual.strftime("%Y-%m-%d")
         
-        # IMAGEN
+        # CASO 1: SI ES UNA IMAGEN
         if media_type == "image":
             url_imagen = respuesta["url"]
-            extension = url_imagen.split("?")[0].split(".")[-1]
+            url_sin_parametros = url_imagen.split("?")[0]
+            extension = url_sin_parametros.split(".")[-1]
             if len(extension) > 4 or not extension:
                 extension = "jpg"
                 
+            # Guardamos el archivo adentro de la carpeta mensual
             nombre_archivo = f"{fecha_str}-{titulo}.{extension}"
             ruta_final_archivo = os.path.join(RUTA_LOCAL, nombre_archivo)
             
             print(f"🚀 Descargando imagen de hoy: {respuesta['title']}...")
-            img_data = requests.get(url_imagen, timeout=15).content
-            
+            img_data = requests.get(url_imagen).content
             with open(ruta_final_archivo, 'wb') as handler:
                 handler.write(img_data)
-                
-            print(f"✅ ¡Éxito! Guardada en su carpeta: {ruta_final_archivo}")
+            print(f"✅ ¡Éxito! Imagen guardada en: {ruta_final_archivo}")
             
-        # VIDEO
+        # CASO 2: SI ES UN VIDEO
         elif media_type == "video":
             url_video = respuesta["url"]
             nombre_archivo = f"{fecha_str}-{titulo}-link_video.txt"
             ruta_final_archivo = os.path.join(RUTA_LOCAL, nombre_archivo)
             
-            print("🎥 Guardando link del video...")
+            print(f"🎥 ¡Hoy la NASA publicó un video!: {respuesta['title']}")
             with open(ruta_final_archivo, 'w') as handler:
                 handler.write(f"Título: {respuesta['title']}\nEnlace: {url_video}\n")
-            print("🔗 ¡Éxito! Link guardado.")
+            print(f"🔗 Guardado link del video en: {ruta_final_archivo}")
             
+    else:
+        print("❌ Estructura inesperada de la respuesta de la NASA.")
+
 except Exception as e:
-    print(f"❌ Hubo un error: {e}")
+    print(f"❌ Hubo un error inesperado: {e}")
