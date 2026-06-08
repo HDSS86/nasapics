@@ -1,0 +1,43 @@
+name: Daily NASA APOD Download
+
+on:
+  schedule:
+    # Runs daily at 10 AM UTC (7 AM Argentina time)
+    - cron: '0 10 * * *'
+  # Allow manual trigger from GitHub UI
+  workflow_dispatch:
+
+jobs:
+  download:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Download NASA APOD image
+        run: python download_pic.py
+      
+      - name: Commit and push if changes exist
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add -A
+          
+          # Only commit if there are changes
+          if git diff --quiet --cached; then
+            echo "No changes to commit"
+          else
+            git commit -m "🛰️ Daily NASA APOD download - $(date +'%Y-%m-%d')"
+            git push
+          fi
