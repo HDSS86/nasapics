@@ -14,6 +14,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
       
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -39,5 +42,5 @@ jobs:
             echo "No changes to commit"
           else
             git commit -m "🛰️ Daily NASA APOD download - $(date +'%Y-%m-%d')"
-            git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+            git push origin master
           fi
