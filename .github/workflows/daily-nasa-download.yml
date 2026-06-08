@@ -39,5 +39,5 @@ jobs:
             echo "No changes to commit"
           else
             git commit -m "🛰️ Daily NASA APOD download - $(date +'%Y-%m-%d')"
-            git push
+            git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
           fi
