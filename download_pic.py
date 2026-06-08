@@ -24,6 +24,8 @@ if not api_key or api_key == "DEMO_KEY" or "AQUÍ" in api_key:
     print("❌ No encontramos una API Key válida en tu app.js.")
     exit()
 
+print(f"✅ API Key encontrada (últimos 4 caracteres): ...{api_key[-4:]}")
+
 # 3. Configuración de Carpetas Dinámicas por Mes y Año
 fecha_actual = datetime.now()
 nombre_mes = MESES[fecha_actual.month]
@@ -57,7 +59,14 @@ URL_NASA = f"https://api.nasa.gov/planetary/apod?api_key={api_key}"
 
 try:
     print("🛰️ Conectando con la API de la NASA...")
-    respuesta = requests.get(URL_NASA).json()
+    respuesta_raw = requests.get(URL_NASA)
+    
+    # Check if the request was successful
+    if respuesta_raw.status_code != 200:
+        print(f"❌ Error HTTP {respuesta_raw.status_code}: {respuesta_raw.text}")
+        exit()
+    
+    respuesta = respuesta_raw.json()
     
     if "error" in respuesta:
         print(f"❌ Error de la NASA: {respuesta['error']['message']}")
