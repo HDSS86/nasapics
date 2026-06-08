@@ -36,17 +36,21 @@ nombre_carpeta_mes = f"nasapics {nombre_mes} {año_actual}"
 RUTA_LOCAL = nombre_carpeta_mes
 os.makedirs(RUTA_LOCAL, exist_ok=True)
 
-# 4. Enlace automático con tu disco C de Windows
-ruta_absoluta_local = os.path.abspath(RUTA_LOCAL)
-ruta_windows_target = f"/mnt/c/VS CODE PROJECTS/nasapics/{nombre_carpeta_mes}"
-
-if not os.path.exists(ruta_windows_target):
-    try:
-        # Ejecuta el comando de Linux para crear el acceso directo en Windows de forma automática
-        subprocess.run(["ln", "-s", ruta_absoluta_local, ruta_windows_target], check=True)
-        print(f"🔗 Enlace creado automáticamente con Windows para: {nombre_carpeta_mes}")
-    except Exception as e:
-        print(f"⚠️ Nota sobre el enlace de Windows: {e}")
+# 4. Enlace automático con tu disco C de Windows (solo en WSL local)
+# Skip this in GitHub Actions environment
+if not os.getenv("GITHUB_ACTIONS"):
+    ruta_absoluta_local = os.path.abspath(RUTA_LOCAL)
+    ruta_windows_target = f"/mnt/c/VS CODE PROJECTS/nasapics/{nombre_carpeta_mes}"
+    
+    if not os.path.exists(ruta_windows_target):
+        try:
+            # Ejecuta el comando de Linux para crear el acceso directo en Windows de forma automática
+            subprocess.run(["ln", "-s", ruta_absoluta_local, ruta_windows_target], check=True)
+            print(f"🔗 Enlace creado automáticamente con Windows para: {nombre_carpeta_mes}")
+        except Exception as e:
+            print(f"⚠️ Nota sobre el enlace de Windows: {e}")
+else:
+    print(f"📁 Corriendo en GitHub Actions. Las imágenes se guardarán en: {RUTA_LOCAL}")
 
 # 5. Petición y descarga a la API de la NASA
 URL_NASA = f"https://api.nasa.gov/planetary/apod?api_key={api_key}"
